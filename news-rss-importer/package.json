@@ -1,0 +1,37 @@
+{
+  "name": "atlantic-anvil-rss-importer",
+  "version": "1.0.0",
+  "description": "RSS Feed Importer for Atlantic Anvil Conservative News Aggregator",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "import": "node index.js",
+    "schedule": "node index.js --schedule",
+    "dev": "nodemon index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "rss-parser": "^3.13.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.3.1",
+    "p-limit": "^5.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "rss",
+    "news",
+    "conservative",
+    "aggregator",
+    "atlantic-anvil"
+  ],
+  "author": "Atlantic Anvil Team",
+  "license": "MIT"
+}
