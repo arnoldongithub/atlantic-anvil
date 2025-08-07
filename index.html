@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Atlantic Anvil Meta Tags -->
+    <meta name="description" content="Atlantic Anvil News - America's Conservative News Aggregator. Breaking news, politics, and commentary from trusted conservative sources." />
+    <meta name="keywords" content="conservative news, Trump, GOP, Republican, politics, breaking news, America First, MAGA" />
+    <meta name="author" content="Atlantic Anvil Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://atlantic-anvil.vercel.app/" />
+    <meta property="og:title" content="Atlantic Anvil News - Conservative News Aggregator" />
+    <meta property="og:description" content="Breaking conservative news and commentary from America's most trusted sources" />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://atlantic-anvil.vercel.app/" />
+    <meta property="twitter:title" content="Atlantic Anvil News" />
+    <meta property="twitter:description" content="Breaking conservative news and commentary" />
+    <meta property="twitter:image" content="/og-image.png" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1a365d" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <title>Atlantic Anvil News - Conservative News Aggregator</title>
+    
+    <!-- Patriotic Styling -->
+    <style>
+      /* Loading Screen Styles */
+      #root:empty {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #1a365d 0%, #c53030 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      #root:empty::before {
+        content: '';
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #d69e2e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      /* Scrollbar Styling */
+      ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #1a365d 0%, #c53030 100%);
+        border-radius: 6px;
+        border: 2px solid #f1f5f9;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #c53030 0%, #d69e2e 100%);
+      }
+      
+      /* Selection Color */
+      ::selection {
+        background: rgba(197, 48, 48, 0.2);
+        color: #1a365d;
+      }
+      
+      ::-moz-selection {
+        background: rgba(197, 48, 48, 0.2);
+        color: #1a365d;
+      }
+    </style>
+    
+    <!-- Google Analytics (uncomment when ready) -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'YOUR_GA_ID');
+    </script>
+    -->
+  </head>
+  <body>
+    <!-- Noscript Fallback -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; background: #1a365d; color: white;">
+        <h1>Atlantic Anvil News</h1>
+        <p>JavaScript is required to view this site. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
+    
+    <!-- React Root -->
+    <div id="root"></div>
+    
+    <!-- Vite Module Script -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
