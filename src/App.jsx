@@ -5,7 +5,8 @@ import NewsCard from './components/NewsCard';
 import SkeletonCard from './components/SkeletonCard';
 import InlineAd from './components/InlineAd';
 import SubscriptionModal from './components/SubscriptionModal';
-import { fetchNews, RSS_FEEDS } from './services/news-api';
+// FIXED: Changed from './services/news-api' to './lib/news-api'
+import { fetchNews, RSS_FEEDS } from './lib/news-api';
 import './index.css';
 
 function App() {
