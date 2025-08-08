@@ -1,4 +1,40 @@
-// Add this to your news-api.js file after the MOCK_NEWS_DATA section:
+// CORS Proxies for fetching RSS feeds
+const CORS_PROXIES = [
+  'https://api.allorigins.win/get?url=',
+  'https://corsproxy.io/?',
+  'https://cors-anywhere.herokuapp.com/'
+];
+
+// RSS Feed URLs by category
+export const RSS_FEEDS = {
+  TRUMP: [
+    { name: 'Fox News Politics', url: 'https://feeds.foxnews.com/foxnews/politics', bias: 'right' },
+    { name: 'Breitbart', url: 'https://feeds.feedburner.com/breitbart', bias: 'right' },
+    { name: 'Daily Wire', url: 'https://feeds.dailywire.com/news', bias: 'right' },
+    { name: 'CNN Politics', url: 'http://rss.cnn.com/rss/cnn_allpolitics.rss', bias: 'left' },
+    { name: 'Reuters Politics', url: 'https://feeds.reuters.com/reuters/politicsNews', bias: 'center' }
+  ],
+  'REPUBLICAN PARTY': [
+    { name: 'Fox News Politics', url: 'https://feeds.foxnews.com/foxnews/politics', bias: 'right' },
+    { name: 'National Review', url: 'https://www.nationalreview.com/rss.xml', bias: 'right' },
+    { name: 'The Hill', url: 'https://thehill.com/news/feed/', bias: 'center' }
+  ],
+  'EUROPE': [
+    { name: 'BBC Europe', url: 'http://feeds.bbci.co.uk/news/world/europe/rss.xml', bias: 'center' },
+    { name: 'Reuters Europe', url: 'https://feeds.reuters.com/reuters/UKdomesticNews', bias: 'center' },
+    { name: 'Euronews', url: 'https://feeds.feedburner.com/euronews/en/home', bias: 'center' }
+  ],
+  'ELON MUSK': [
+    { name: 'TechCrunch', url: 'https://techcrunch.com/feed/', bias: 'center' },
+    { name: 'Ars Technica', url: 'http://feeds.arstechnica.com/arstechnica/index', bias: 'center' },
+    { name: 'Reuters Technology', url: 'https://feeds.reuters.com/reuters/technologyNews', bias: 'center' }
+  ],
+  'STEVE BANNON': [
+    { name: 'Breitbart', url: 'https://feeds.feedburner.com/breitbart', bias: 'right' },
+    { name: 'Daily Wire', url: 'https://feeds.dailywire.com/news', bias: 'right' },
+    { name: 'Politico', url: 'https://www.politico.com/rss/politicopicks.xml', bias: 'center' }
+  ]
+};
 
 // Mock data for development/fallback
 const MOCK_NEWS_DATA = {
@@ -18,13 +54,96 @@ const MOCK_NEWS_DATA = {
       is_breaking: false,
       is_featured: true,
       trending_score: 8
+    },
+    {
+      id: '2',
+      title: 'Political Rally Draws Thousands in Key Swing State',
+      excerpt: 'Large crowds gather for major political event in battleground state.',
+      url: 'https://example.com/article2',
+      source: 'CNN',
+      imageUrl: 'https://picsum.photos/400/240?random=2',
+      image_url: 'https://picsum.photos/400/240?random=2',
+      thumbnail_url: 'https://picsum.photos/400/240?random=2',
+      timeAgo: '4h ago',
+      readTime: '3 min read',
+      reading_time: 3,
+      is_breaking: true,
+      is_featured: false,
+      trending_score: 6
     }
-    // Add more mock articles as needed
   ],
-  'REPUBLICAN PARTY': [],
-  'EUROPE': [],
-  'ELON MUSK': [],
-  'STEVE BANNON': []
+  'REPUBLICAN PARTY': [
+    {
+      id: '3',
+      title: 'GOP Leaders Meet to Discuss Legislative Priorities',
+      excerpt: 'Republican leadership convenes to outline key policy objectives for upcoming session.',
+      url: 'https://example.com/article3',
+      source: 'Reuters',
+      imageUrl: 'https://picsum.photos/400/240?random=3',
+      image_url: 'https://picsum.photos/400/240?random=3',
+      thumbnail_url: 'https://picsum.photos/400/240?random=3',
+      timeAgo: '1h ago',
+      readTime: '5 min read',
+      reading_time: 5,
+      is_breaking: false,
+      is_featured: true,
+      trending_score: 7
+    }
+  ],
+  'EUROPE': [
+    {
+      id: '4',
+      title: 'European Union Announces New Trade Agreement',
+      excerpt: 'Major economic partnership signed with significant implications for international commerce.',
+      url: 'https://example.com/article4',
+      source: 'BBC',
+      imageUrl: 'https://picsum.photos/400/240?random=4',
+      image_url: 'https://picsum.photos/400/240?random=4',
+      thumbnail_url: 'https://picsum.photos/400/240?random=4',
+      timeAgo: '3h ago',
+      readTime: '6 min read',
+      reading_time: 6,
+      is_breaking: false,
+      is_featured: false,
+      trending_score: 5
+    }
+  ],
+  'ELON MUSK': [
+    {
+      id: '5',
+      title: 'SpaceX Successfully Launches Next-Generation Satellite',
+      excerpt: 'Latest mission marks significant milestone in commercial space exploration.',
+      url: 'https://example.com/article5',
+      source: 'TechCrunch',
+      imageUrl: 'https://picsum.photos/400/240?random=5',
+      image_url: 'https://picsum.photos/400/240?random=5',
+      thumbnail_url: 'https://picsum.photos/400/240?random=5',
+      timeAgo: '5h ago',
+      readTime: '4 min read',
+      reading_time: 4,
+      is_breaking: true,
+      is_featured: true,
+      trending_score: 9
+    }
+  ],
+  'STEVE BANNON': [
+    {
+      id: '6',
+      title: 'Political Strategist Comments on Current Events',
+      excerpt: 'Analysis and commentary on recent political developments and their implications.',
+      url: 'https://example.com/article6',
+      source: 'Politico',
+      imageUrl: 'https://picsum.photos/400/240?random=6',
+      image_url: 'https://picsum.photos/400/240?random=6',
+      thumbnail_url: 'https://picsum.photos/400/240?random=6',
+      timeAgo: '6h ago',
+      readTime: '7 min read',
+      reading_time: 7,
+      is_breaking: false,
+      is_featured: false,
+      trending_score: 4
+    }
+  ]
 };
 
 // RSS parser using DOMParser
