@@ -1,37 +1,51 @@
 {
-  "name": "atlantic-anvil-rss-importer",
+  "name": "atlantic-anvil-news",
   "version": "1.0.0",
-  "description": "RSS Feed Importer for Atlantic Anvil Conservative News Aggregator",
   "type": "module",
-  "main": "index.js",
+  "description": "Atlantic Anvil - Conservative News Aggregator",
+  "keywords": ["news", "conservative", "politics", "react", "vite"],
+  "author": "Atlantic Anvil Team",
+  "license": "MIT",
   "scripts": {
-    "start": "node index.js",
-    "import": "node index.js",
-    "schedule": "node index.js --schedule",
-    "dev": "nodemon index.js",
-    "test": "node test.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "summarize": "python summarize.py",
+    "batch-summarize": "python batch_summarize.py"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
-    "rss-parser": "^3.13.0",
-    "node-cron": "^3.0.3",
-    "dotenv": "^16.3.1",
-    "p-limit": "^5.0.0",
-    "node-fetch": "^3.3.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "lucide-react": "^0.263.1",
+    "clsx": "^2.0.0",
+    "class-variance-authority": "^0.7.0",
+    "@supabase/supabase-js": "^2.38.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@vitejs/plugin-react": "^4.1.1",
+    "vite": "^5.0.0",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
-  "keywords": [
-    "rss",
-    "news",
-    "conservative",
-    "aggregator",
-    "atlantic-anvil"
-  ],
-  "author": "Atlantic Anvil Team",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/atlantic-anvil-news.git"
+  },
+  "homepage": "https://atlantic-anvil.vercel.app",
+  "bugs": {
+    "url": "https://github.com/your-username/atlantic-anvil-news/issues"
+  }
 }
