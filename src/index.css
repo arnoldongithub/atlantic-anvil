@@ -2072,6 +2072,9 @@ body {
   scrollbar-color: hsl(var(--header-bg)) hsl(var(--muted));
 }
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ===========================================
    END OF STYLESHEET
    
