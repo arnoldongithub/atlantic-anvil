@@ -7,7 +7,7 @@ import SkeletonCard from './components/SkeletonCard';
 import InlineAd from './components/InlineAd';
 import SubscriptionModal from './components/SubscriptionModal';
 // ─── FIXED IMPORT ───────────────────────────────────────
-import fetchNews from './lib/news-api.js';
+import { fetchNews } from './lib/news-api.js';
 import './index.css';
 
 function App() {
