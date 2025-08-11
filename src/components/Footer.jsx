@@ -4,36 +4,44 @@ const Footer = () => {
   return (
     <footer className="footer-section">
       <div className="footer-content">
-        <div className="footer-grid">
-          {/* About Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {/* About Atlantic Anvil */}
           <div>
-            <h3 className="footer-section-title">About ConservativeNews</h3>
-            <ul className="footer-links">
+            <h3 className="text-white font-bold text-lg mb-4">About Atlantic Anvil</h3>
+            <ul className="space-y-2">
               <li>
-                <a href="/about" className="footer-link">Our Mission</a>
+                <a href="/about" className="text-gray-300 hover:text-white transition-colors">
+                  Our Mission
+                </a>
               </li>
               <li>
-                <a href="/team" className="footer-link">Our Team</a>
+                <a href="/team" className="text-gray-300 hover:text-white transition-colors">
+                  Our Team
+                </a>
               </li>
               <li>
-                <a href="/methodology" className="footer-link">Methodology</a>
+                <a href="/methodology" className="text-gray-300 hover:text-white transition-colors">
+                  Methodology
+                </a>
               </li>
               <li>
-                <a href="/careers" className="footer-link">Careers</a>
+                <a href="/careers" className="text-gray-300 hover:text-white transition-colors">
+                  Careers
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Support Section */}
+          {/* Support */}
           <div>
-            <h3 className="footer-section-title">Support</h3>
-            <ul className="footer-links">
+            <h3 className="text-white font-bold text-lg mb-4">Support</h3>
+            <ul className="space-y-2">
               <li>
                 <a 
                   href="https://www.heritage.org/donate" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="footer-link"
+                  className="text-gray-300 hover:text-white transition-colors"
                 >
                   Donate to Heritage Foundation
                 </a>
@@ -43,7 +51,7 @@ const Footer = () => {
                   href="https://www.judicialwatch.org/donate/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="footer-link"
+                  className="text-gray-300 hover:text-white transition-colors"
                 >
                   Support Judicial Watch
                 </a>
@@ -53,67 +61,85 @@ const Footer = () => {
                   href="https://www.freedomworks.org/donate" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="footer-link"
+                  className="text-gray-300 hover:text-white transition-colors"
                 >
                   Donate to FreedomWorks
                 </a>
               </li>
               <li>
-                <a href="/subscription" className="footer-link">Premium Subscription</a>
+                <a href="/subscription" className="text-gray-300 hover:text-white transition-colors">
+                  Premium Subscription
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Resources Section */}
+          {/* Resources */}
           <div>
-            <h3 className="footer-section-title">Resources</h3>
-            <ul className="footer-links">
+            <h3 className="text-white font-bold text-lg mb-4">Resources</h3>
+            <ul className="space-y-2">
               <li>
-                <a href="/bias-chart" className="footer-link">Media Bias Chart</a>
+                <a href="/bias-chart" className="text-gray-300 hover:text-white transition-colors">
+                  Media Bias Chart
+                </a>
               </li>
               <li>
-                <a href="/fact-check" className="footer-link">Fact Checking</a>
+                <a href="/fact-check" className="text-gray-300 hover:text-white transition-colors">
+                  Fact Checking
+                </a>
               </li>
               <li>
-                <a href="/blindspots" className="footer-link">Media Blindspots</a>
+                <a href="/blindspots" className="text-gray-300 hover:text-white transition-colors">
+                  Media Blindspots
+                </a>
               </li>
               <li>
-                <a href="/api" className="footer-link">API Access</a>
+                <a href="/api" className="text-gray-300 hover:text-white transition-colors">
+                  API Access
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Legal Section */}
+          {/* Legal */}
           <div>
-            <h3 className="footer-section-title">Legal</h3>
-            <ul className="footer-links">
+            <h3 className="text-white font-bold text-lg mb-4">Legal</h3>
+            <ul className="space-y-2">
               <li>
-                <a href="/privacy" className="footer-link">Privacy Policy</a>
+                <a href="/privacy" className="text-gray-300 hover:text-white transition-colors">
+                  Privacy Policy
+                </a>
               </li>
               <li>
-                <a href="/terms" className="footer-link">Terms of Service</a>
+                <a href="/terms" className="text-gray-300 hover:text-white transition-colors">
+                  Terms of Service
+                </a>
               </li>
               <li>
-                <a href="/cookie-policy" className="footer-link">Cookie Policy</a>
+                <a href="/cookie-policy" className="text-gray-300 hover:text-white transition-colors">
+                  Cookie Policy
+                </a>
               </li>
               <li>
-                <a href="/contact" className="footer-link">Contact Us</a>
+                <a href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  Contact Us
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Social Media & Newsletter */}
-        <div className="border-t border-neutral-700 pt-6 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="border-t border-gray-700 pt-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h4 className="text-white font-semibold mb-3">Follow Us</h4>
-              <div className="flex gap-4">
+              <h4 className="text-white font-bold text-lg mb-4">Follow Us</h4>
+              <div className="flex flex-wrap gap-4">
                 <a
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="footer-link flex items-center gap-2"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                   title="Follow us on Twitter"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -126,7 +152,7 @@ const Footer = () => {
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="footer-link flex items-center gap-2"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                   title="Follow us on Facebook"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -136,10 +162,10 @@ const Footer = () => {
                 </a>
 
                 <a
-                  href="https://t.me/conservativenews"
+                  href="https://t.me/atlanticanvil"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="footer-link flex items-center gap-2"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                   title="Join our Telegram channel"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -152,7 +178,7 @@ const Footer = () => {
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="footer-link flex items-center gap-2"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                   title="Subscribe to our YouTube channel"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -164,17 +190,17 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-3">Stay Informed</h4>
-              <p className="text-sm text-neutral-400 mb-3">
+              <h4 className="text-white font-bold text-lg mb-4">Stay Informed</h4>
+              <p className="text-gray-300 text-sm mb-4">
                 Get breaking conservative news delivered to your inbox daily
               </p>
               <div className="flex gap-2">
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="flex-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                 />
-                <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium">
+                <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-bold transition-colors">
                   Subscribe
                 </button>
               </div>
@@ -183,15 +209,15 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="footer-bottom">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4 text-sm">
-              <span>© {currentYear} ConservativeNews. All rights reserved.</span>
+        <div className="border-t border-gray-700 pt-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+              <span>© {currentYear} Atlantic Anvil. All rights reserved.</span>
               <span>•</span>
               <span>Defending Conservative Values Since 2024</span>
             </div>
             
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm text-gray-300">
               <span className="flex items-center gap-2">
                 🇺🇸 Proudly American
               </span>
@@ -202,7 +228,7 @@ const Footer = () => {
             </div>
           </div>
           
-          <div className="mt-4 pt-4 border-t border-neutral-700 text-center text-xs text-neutral-500">
+          <div className="text-center text-xs text-gray-400">
             <p>
               This website aggregates news from various conservative sources. 
               We are committed to providing balanced reporting while maintaining our conservative perspective. 
