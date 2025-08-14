@@ -2,7 +2,7 @@
  * Atlantic Anvil – news-api (complete, client-side Supabase)
  * - Mirrors the ItsActuallyGoodNews UX needs
  * - Keeps Atlantic Anvil theme/fields
- * - Exposes “Source” (no positivity bar)
+ * - Exposes "Source" (no positivity bar)
  * - Adds related stories, trending/latest, category & search helpers
  *
  * NOTE: This is a browser-safe client. Keep Row Level Security ON and write
@@ -248,7 +248,201 @@ export async function fetchHomeSections({
 }
 
 /* ------------------------------------------------------------------ */
+/* MAIN fetchNews function for App.jsx compatibility                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Primary fetchNews function that App.jsx expects
+ * Maps your Atlantic Anvil categories to database queries
+ * @param {string} category - Category name (TRUMP, REPUBLICAN PARTY, etc.)
+ * @param {object} options - Additional options like limit, cursor
+ * @returns {Promise<object[]>}
+ */
+export async function fetchNews(category = 'TRUMP', options = {}) {
+  const { limit = DEFAULT_LIMIT, cursor } = options;
+  
+  try {
+    console.log(`[fetchNews] Loading news for category: ${category}`);
+    
+    // Handle your specific Atlantic Anvil categories
+    let queryCategory = category;
+    
+    // Map your frontend categories to database categories if needed
+    const categoryMapping = {
+      'TRUMP': 'TRUMP',
+      'REPUBLICAN PARTY': 'REPUBLICAN PARTY', 
+      'EUROPE': 'EUROPE',
+      'ELON MUSK': 'ELON MUSK',
+      'STEVE BANNON': 'STEVE BANNON'
+    };
+    
+    // Use mapped category or fallback to original
+    const dbCategory = categoryMapping[category] || category;
+    
+    // If it's a specific category, fetch by category
+    if (dbCategory && dbCategory !== 'ALL') {
+      const stories = await fetchByCategory(dbCategory, { limit, cursor });
+      console.log(`[fetchNews] Found ${stories.length} stories for ${dbCategory}`);
+      return stories;
+    }
+    
+    // If category is 'ALL' or undefined, fetch latest
+    const stories = await fetchLatest({ limit, cursor });
+    console.log(`[fetchNews] Found ${stories.length} latest stories`);
+    return stories;
+    
+  } catch (error) {
+    console.error(`[fetchNews] Error fetching news for category ${category}:`, error);
+    
+    // Return empty array instead of throwing to prevent UI crashes
+    return [];
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Enhanced category search (for better matching)                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Enhanced category search that handles partial matches and variations
+ * @param {string} categoryTerm - Category to search for
+ * @param {object} options - Search options
+ * @returns {Promise<object[]>}
+ */
+export async function fetchNewsByTerm(categoryTerm, options = {}) {
+  const { limit = DEFAULT_LIMIT } = options;
+  
+  if (!categoryTerm) {
+    return await fetchLatest({ limit });
+  }
+  
+  try {
+    // First try exact category match
+    const exactMatch = await fetchByCategory(categoryTerm, { limit });
+    if (exactMatch.length > 0) {
+      return exactMatch;
+    }
+    
+    // If no exact match, try search in title/content
+    const searchResults = await searchStories(categoryTerm, { limit });
+    return searchResults;
+    
+  } catch (error) {
+    console.error(`[fetchNewsByTerm] Error:`, error);
+    return [];
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Performance optimization hooks (for React integration)             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Cache for frequently accessed data
+ */
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Cached version of fetchNews for better performance
+ * @param {string} category 
+ * @param {object} options 
+ * @returns {Promise<object[]>}
+ */
+export async function fetchNewsCached(category, options = {}) {
+  const cacheKey = `${category}-${JSON.stringify(options)}`;
+  const cached = cache.get(cacheKey);
+  
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`[fetchNewsCached] Using cached data for ${category}`);
+    return cached.data;
+  }
+  
+  const data = await fetchNews(category, options);
+  cache.set(cacheKey, {
+    data,
+    timestamp: Date.now()
+  });
+  
+  return data;
+}
+
+/**
+ * Clear the cache (useful for force refresh)
+ */
+export function clearNewsCache() {
+  cache.clear();
+  console.log('[clearNewsCache] Cache cleared');
+}
+
+/* ------------------------------------------------------------------ */
 /* Back-compat aliases (if older code imports these)                   */
 /* ------------------------------------------------------------------ */
 export const fetchArticleById = fetchStoryById
 export const fetchRelatedArticles = fetchRelatedStories
+
+/* ------------------------------------------------------------------ */
+/* React hooks for easier integration                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Simple hook factory for React components
+ * Usage: const { data, loading, error } = useNews('TRUMP')
+ */
+export function createUseNews() {
+  return function useNews(category, options = {}) {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    useEffect(() => {
+      let mounted = true;
+      
+      async function loadData() {
+        try {
+          setLoading(true);
+          setError(null);
+          const result = await fetchNews(category, options);
+          if (mounted) {
+            setData(result);
+          }
+        } catch (err) {
+          if (mounted) {
+            setError(err.message);
+            console.error('[useNews] Error:', err);
+          }
+        } finally {
+          if (mounted) {
+            setLoading(false);
+          }
+        }
+      }
+      
+      loadData();
+      
+      return () => {
+        mounted = false;
+      };
+    }, [category, JSON.stringify(options)]);
+    
+    return { data, loading, error };
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Export configuration for debugging                                  */
+/* ------------------------------------------------------------------ */
+
+export const config = {
+  TABLE_STORIES,
+  COLS,
+  DEFAULT_LIMIT,
+  supabaseUrl: SUPA_URL,
+  hasSupabaseKey: !!SUPA_KEY
+};
+
+console.log('[news-api] Loaded with config:', {
+  table: TABLE_STORIES,
+  hasCredentials: !!(SUPA_URL && SUPA_KEY),
+  defaultLimit: DEFAULT_LIMIT
+});
