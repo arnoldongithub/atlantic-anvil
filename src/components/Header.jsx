@@ -1,149 +1,72 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 
-const Header = ({ 
-  onSubscribe, 
-  onDonate, 
-  onMerch, 
-  categories, 
-  activeCategory, 
-  onCategoryChange 
-}) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const handleDonate = () => {
-    // GiveSendGo and worldwide donation platforms
-    window.open('https://www.givesendgo.com', '_blank');
-  };
-
-  const handleShop = () => {
-    // Placeholder for merchandise store
-    window.open('#shop', '_blank');
-  };
-
-  const handleSubscribe = () => {
-    if (onSubscribe) onSubscribe();
-  };
+export default function Header() {
+  const [open, setOpen] = useState(false)
+  const linkClass = ({isActive}) =>
+    `aa-link px-3 py-2 rounded ${isActive ? 'text-white underline underline-offset-4' : ''}`
 
   return (
-    <header className="header-section">
-      <div className="header-content">
-        {/* Logo */}
-        <div className="logo-container">
-          <a href="/" className="logo-text">
-            🦅 Atlantic Anvil
-          </a>
-        </div>
-
-        {/* Desktop Action Buttons - Top Right */}
-        <div className="header-actions desktop-actions">
-          <button
-            onClick={handleSubscribe}
-            className="subscribe-button-header"
-            title="Subscribe to Premium Features"
-          >
-            ⭐ Subscribe
-          </button>
-          
-          <button
-            onClick={handleShop}
-            className="shop-button-header"
-            title="Shop Atlantic Anvil Merchandise"
-          >
-            🛍️ Shop
-          </button>
-          
-          <button
-            onClick={handleDonate}
-            className="donate-button-header"
-            title="Support Conservative Causes"
-          >
-            💝 Donate
-          </button>
-
-          {/* Mobile menu button */}
-          <button
-            className="mobile-menu-toggle md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    <header className="aa-header sticky top-0 z-40">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-14 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              className="inline-flex h-9 w-9 items-center justify-center rounded md:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aa-gold)]"
+              aria-label="Toggle navigation"
+              onClick={() => setOpen(v => !v)}
             >
-              {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                <path d="M3 6h18M3 12h18M3 18h18"/>
+              </svg>
+            </button>
 
-      {/* Mobile Action Buttons - Below Logo, Above Categories */}
-      <div className="mobile-actions-section md:hidden">
-        <div className="mobile-actions-container">
-          <button
-            onClick={handleSubscribe}
-            className="subscribe-button-mobile"
-          >
-            ⭐ Subscribe
-          </button>
-          
-          <button
-            onClick={handleShop}
-            className="shop-button-mobile"
-          >
-            🛍️ Shop
-          </button>
-          
-          <button
-            onClick={handleDonate}
-            className="donate-button-mobile"
-          >
-            💝 Donate
-          </button>
-        </div>
-      </div>
+            <Link to="/" className="flex items-center gap-2" aria-label="Atlantic Anvil home">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm"
+                    style={{background:'var(--aa-gold)', color:'#1a1a1a', fontWeight:700}}>AA</span>
+              <span className="text-slate-100 font-semibold">Atlantic Anvil</span>
+            </Link>
+          </div>
 
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
-        <div className="mobile-menu-overlay md:hidden">
-          <div className="container py-4 space-y-2">
-            <h3 className="text-white font-semibold mb-3">Navigation</h3>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => {
-                  onCategoryChange(category);
-                  setMobileMenuOpen(false);
-                }}
-                className={`block w-full text-left px-4 py-2 rounded-md transition-colors ${
-                  activeCategory === category
-                    ? 'bg-destructive text-destructive-foreground'
-                    : 'text-white/90 hover:bg-white/10'
-                }`}
-              >
-                {category.replace('_', ' ')}
-              </button>
-            ))}
+          <nav className="hidden md:flex items-center gap-1" aria-label="Primary">
+            <NavLink to="/" className={linkClass}>Home</NavLink>
+            <NavLink to="/latest" className={linkClass}>Latest</NavLink>
+            <NavLink to="/trending" className={linkClass}>Trending</NavLink>
+            <NavLink to="/categories" className={linkClass}>Categories</NavLink>
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
+            <input
+              type="search"
+              inputMode="search"
+              className="aa-search h-9 w-52 rounded px-3 text-sm placeholder:italic"
+              placeholder="Search good news…"
+              aria-label="Search"
+            />
+            <Link to="/subscribe" className="aa-btn h-9 inline-flex items-center rounded px-3 text-sm font-medium">
+              Subscribe
+            </Link>
           </div>
         </div>
-      )}
-    </header>
-  );
-};
 
-export default Header;
+        {open && (
+          <div className="md:hidden pb-3">
+            <nav className="flex flex-col gap-1 pt-2" aria-label="Mobile">
+              <NavLink to="/" className={linkClass} onClick={()=>setOpen(false)}>Home</NavLink>
+              <NavLink to="/latest" className={linkClass} onClick={()=>setOpen(false)}>Latest</NavLink>
+              <NavLink to="/trending" className={linkClass} onClick={()=>setOpen(false)}>Trending</NavLink>
+              <NavLink to="/categories" className={linkClass} onClick={()=>setOpen(false)}>Categories</NavLink>
+              <div className="mt-2 flex items-center gap-2">
+                <input type="search" className="aa-search h-9 flex-1 rounded px-3 text-sm" placeholder="Search…" />
+                <Link to="/subscribe" className="aa-btn h-9 inline-flex items-center rounded px-3 text-sm font-medium">
+                  Subscribe
+                </Link>
+              </div>
+            </nav>
+          </div>
+        )}
+      </div>
+    </header>
+  )
+}
+

@@ -1,206 +1,254 @@
-// src/lib/news-api.js
-// Supabase-backed news API. Reads from article_with_blindspot view.
-// Exposes blindspot flags and coverage counts. Persists category slugs.
+/**
+ * Atlantic Anvil – news-api (complete, client-side Supabase)
+ * - Mirrors the ItsActuallyGoodNews UX needs
+ * - Keeps Atlantic Anvil theme/fields
+ * - Exposes “Source” (no positivity bar)
+ * - Adds related stories, trending/latest, category & search helpers
+ *
+ * NOTE: This is a browser-safe client. Keep Row Level Security ON and write
+ * policies to allow read access for the anon key.
+ */
 
-import { supabase } from './supabase';
+import { createClient } from '@supabase/supabase-js'
 
-export const CATEGORY_SLUGS = {
-  'Trump': 'trump',
-  'Republican Party': 'republican-party',
-  'Culture': 'culture',
-  'Europe': 'europe',
-  'Elon Musk': 'elon-musk',
-  'Steve Bannon': 'steve-bannon',
-};
+/* ------------------------------------------------------------------ */
+/* Supabase client                                                     */
+/* ------------------------------------------------------------------ */
+const SUPA_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPA_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-async function getCategoryIdBySlug(slug) {
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, slug')
-    .eq('slug', slug)
-    .maybeSingle();
-  if (error) {
-    console.warn('getCategoryIdBySlug error:', error);
-    return null;
+if (!SUPA_URL || !SUPA_KEY) {
+  // Do not throw at module scope to avoid SSR/build issues; log instead.
+  console.error(
+    '[news-api] Missing Supabase env. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+  )
+}
+
+export const supabase = createClient(SUPA_URL ?? '', SUPA_KEY ?? '')
+
+/* ------------------------------------------------------------------ */
+/* Schema config – tweak names if your DB differs                      */
+/* ------------------------------------------------------------------ */
+const TABLE_STORIES = 'stories'
+
+/** Columns we select from the DB. Add/remove if your table differs. */
+const COLS = `
+  id,
+  slug,
+  title,
+  excerpt,
+  content,
+  image,
+  thumbnail,
+  author,
+  source,
+  category,
+  category_slug,
+  tags,
+  published_at
+`
+
+/** Default page size */
+const DEFAULT_LIMIT = 12
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ensure a consistent client-side shape for story objects.
+ * This keeps the UI stable even if some columns are null/missing.
+ */
+function normalizeStory(row) {
+  if (!row) return null
+  const id = row.id ?? row.slug
+  const slug = row.slug ?? String(row.id ?? '')
+  return {
+    id,
+    slug,
+    title: row.title ?? '',
+    excerpt: row.excerpt ?? '',
+    content: row.content ?? '',
+    image: row.image ?? row.thumbnail ?? null,
+    thumbnail: row.thumbnail ?? null,
+    author: row.author ?? null,
+    source: row.source ?? null,                 // <— USED BY SourceBadge
+    category: row.category ?? row.category_slug ?? null,
+    category_slug: row.category_slug ?? row.category ?? null,
+    tags: Array.isArray(row.tags) ? row.tags : (row.tags ? String(row.tags).split(',').map(s=>s.trim()).filter(Boolean) : []),
+    published_at: row.published_at ?? null
   }
-  return data?.id ?? null;
+}
+
+/** Simple guard to avoid crashing UI on Supabase errors. */
+function resultOrThrow({ data, error }) {
+  if (error) throw error
+  return data ?? []
+}
+
+/** Basic cursor helper using published_at then id (stable ordering). */
+function applyCursor(q, { after, before } = {}) {
+  if (after?.published_at && after?.id) {
+    // fetch items strictly older than the cursor (for infinite scroll down)
+    q = q.lt('published_at', after.published_at).order('published_at', { ascending: false }).order('id', { ascending: false })
+  } else if (before?.published_at && before?.id) {
+    // fetch items newer than the cursor (rarely used in UI, but available)
+    q = q.gt('published_at', before.published_at).order('published_at', { ascending: true }).order('id', { ascending: true })
+  } else {
+    // default order
+    q = q.order('published_at', { ascending: false }).order('id', { ascending: false })
+  }
+  return q
+}
+
+/* ------------------------------------------------------------------ */
+/* Single story                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Fetch a single story by ID (uuid) or slug (string).
+ * @param {string} idOrSlug
+ * @returns {Promise<object>}
+ */
+export async function fetchStoryById(idOrSlug) {
+  if (!idOrSlug) throw new Error('Missing story id/slug')
+
+  // crude uuid check; adjust if you use different id format
+  const looksLikeUuid = /^[0-9a-f-]{10,}$/i.test(idOrSlug)
+
+  let query = supabase.from(TABLE_STORIES).select(COLS).limit(1)
+  query = looksLikeUuid ? query.eq('id', idOrSlug) : query.eq('slug', idOrSlug)
+
+  const { data, error } = await query
+  if (error) throw error
+  if (!data || !data.length) throw new Error('Story not found')
+
+  return normalizeStory(data[0])
+}
+
+/* ------------------------------------------------------------------ */
+/* Related stories                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Fetch related stories by category/category_slug, excluding the current story.
+ * @param {string} categorySlugOrName
+ * @param {string} currentIdOrSlug
+ * @param {{limit?:number}} options
+ * @returns {Promise<object[]>}
+ */
+export async function fetchRelatedStories(categorySlugOrName, currentIdOrSlug, { limit = 8 } = {}) {
+  if (!categorySlugOrName) return []
+
+  // We filter on either category_slug or category to be flexible with data.
+  let q = supabase
+    .from(TABLE_STORIES)
+    .select(COLS)
+    .or(`category_slug.eq.${categorySlugOrName},category.eq.${categorySlugOrName}`)
+    .limit(limit + 1) // +1 so we can safely exclude current after normalize
+  q = q.order('published_at', { ascending: false }).order('id', { ascending: false })
+
+  const { data, error } = await q
+  if (error) {
+    console.warn('[news-api] related error:', error)
+    return []
+  }
+
+  const list = (data || []).map(normalizeStory)
+  // exclude current by id or slug
+  const filtered = list.filter(
+    s => s.id !== currentIdOrSlug && s.slug !== currentIdOrSlug
+  )
+  return filtered.slice(0, limit)
+}
+
+/* ------------------------------------------------------------------ */
+/* Lists: trending, latest, by category, search                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Trending – here we just use most recent. If you track score/views,
+ * replace the ordering below with your own (e.g., .order('score',{...}))
+ */
+export async function fetchTrending({ limit = DEFAULT_LIMIT, cursor } = {}) {
+  let q = supabase.from(TABLE_STORIES).select(COLS).limit(limit)
+  q = applyCursor(q, cursor)
+  const res = await q
+  return resultOrThrow(res).map(normalizeStory)
+}
+
+/** Latest – same as trending by time unless you differentiate */
+export async function fetchLatest({ limit = DEFAULT_LIMIT, cursor } = {}) {
+  return fetchTrending({ limit, cursor })
 }
 
 /**
- * Fetch latest published articles by category slug.
- * Falls back to a keyword text search if the category doesn't exist (e.g., Culture before seeded).
+ * By category
+ * @param {string} categorySlugOrName
+ * @param {{limit?:number,cursor?:object}} options
  */
-export async function fetchNewsByCategorySlug(slug, { limit = 30 } = {}) {
-  const categoryId = await getCategoryIdBySlug(slug);
-
-  const base = supabase
-    .from('article_with_blindspot')
-    .select(`
-      id,
-      title,
-      excerpt,
-      summary,
-      original_url,
-      image_url,
-      thumbnail_url,
-      published_at,
-      reading_time,
-      is_breaking,
-      is_featured,
-      trending_score,
-      category_id,
-      source_display,
-      left_hits,
-      center_hits,
-      right_hits,
-      blindspot_left,
-      cluster_key
-    `)
-    .order('published_at', { ascending: false })
-    .limit(limit);
-
-  let res;
-  if (categoryId) {
-    res = await base.eq('category_id', categoryId);
-  } else {
-    // fallback: keyword search against tsvector (your table defines search_vector on articles)
-    res = await base.textSearch('search_vector', slugToKeyword(slug), { type: 'plain' });
-  }
-
-  const { data, error } = res;
-  if (error) {
-    console.error('fetchNewsByCategorySlug error:', error);
-    return [];
-  }
-  return normalizeArticles(data);
+export async function fetchByCategory(categorySlugOrName, { limit = DEFAULT_LIMIT, cursor } = {}) {
+  if (!categorySlugOrName) return []
+  let q = supabase.from(TABLE_STORIES).select(COLS).limit(limit)
+  q = q.or(`category_slug.eq.${categorySlugOrName},category.eq.${categorySlugOrName}`)
+  q = applyCursor(q, cursor)
+  const res = await q
+  return resultOrThrow(res).map(normalizeStory)
 }
 
-export async function fetchArticleById(id) {
+/**
+ * Search by title/excerpt/content (simple ilike OR).
+ * Consider adding a server-side function or pg_trgm index for scale.
+ */
+export async function searchStories(queryText, { limit = DEFAULT_LIMIT } = {}) {
+  if (!queryText) return []
+  const like = `%${queryText}%`
   const { data, error } = await supabase
-    .from('article_with_blindspot')
-    .select(`
-      id,
-      title,
-      excerpt,
-      summary,
-      original_url,
-      image_url,
-      thumbnail_url,
-      published_at,
-      reading_time,
-      is_breaking,
-      is_featured,
-      trending_score,
-      category_id,
-      source_display,
-      left_hits,
-      center_hits,
-      right_hits,
-      blindspot_left,
-      cluster_key
-    `)
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) {
-    console.error('fetchArticleById error:', error);
-    return null;
-  }
-  if (!data) return null;
-  return normalizeArticle(data);
-}
-
-export async function fetchRelatedArticles(categorySlug, excludeId, { limit = 6 } = {}) {
-  const categoryId = await getCategoryIdBySlug(categorySlug);
-  if (!categoryId) return [];
-
-  const { data, error } = await supabase
-    .from('article_with_blindspot')
-    .select(`
-      id,
-      title,
-      excerpt,
-      summary,
-      original_url,
-      image_url,
-      thumbnail_url,
-      published_at,
-      reading_time,
-      is_breaking,
-      is_featured,
-      trending_score,
-      category_id,
-      source_display,
-      left_hits,
-      center_hits,
-      right_hits,
-      blindspot_left,
-      cluster_key
-    `)
-    .eq('category_id', categoryId)
-    .neq('id', excludeId)
+    .from(TABLE_STORIES)
+    .select(COLS)
+    .or(
+      [
+        `title.ilike.${like}`,
+        `excerpt.ilike.${like}`,
+        `content.ilike.${like}`
+      ].join(',')
+    )
     .order('published_at', { ascending: false })
-    .limit(limit);
+    .limit(limit)
 
-  if (error) {
-    console.error('fetchRelatedArticles error:', error);
-    return [];
-  }
-  return normalizeArticles(data);
+  if (error) throw error
+  return (data || []).map(normalizeStory)
 }
 
-/** Backwards-compatible helper. Accepts pretty labels or slugs. */
-export async function fetchNews(categoryOrSlug = 'Trump', opts) {
-  const slug = CATEGORY_SLUGS[categoryOrSlug] ?? categoryOrSlug;
-  return fetchNewsByCategorySlug(slug, opts);
+/* ------------------------------------------------------------------ */
+/* Home sections convenience                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Fetch blocks needed by the homepage (optional convenience).
+ */
+export async function fetchHomeSections({
+  trendingLimit = 10,
+  latestLimit = 10,
+  categoryLimits = {} // e.g., { world:6, science:6 }
+} = {}) {
+  const [trending, latest, categories] = await Promise.all([
+    fetchTrending({ limit: trendingLimit }),
+    fetchLatest({ limit: latestLimit }),
+    Promise.all(
+      Object.entries(categoryLimits).map(async ([slug, lim]) => {
+        const items = await fetchByCategory(slug, { limit: lim ?? 6 })
+        return [slug, items]
+      })
+    )
+  ])
+
+  const byCategory = Object.fromEntries(categories)
+  return { trending, latest, byCategory }
 }
 
-/* ---------------- helpers ---------------- */
-
-function slugToKeyword(slug) {
-  switch (slug) {
-    case 'culture': return 'culture';
-    case 'trump': return 'trump';
-    case 'republican-party': return 'republican | gop';
-    case 'europe': return 'europe | eu | uk | britain | italy | germany | france';
-    case 'elon-musk': return 'elon | musk | tesla | spacex | x.com';
-    case 'steve-bannon': return 'bannon | war room';
-    default: return slug;
-  }
-}
-
-function normalizeArticles(rows) {
-  return (rows || []).map(normalizeArticle);
-}
-
-function normalizeArticle(row) {
-  const timeAgo = row?.published_at ? smartTimeAgo(new Date(row.published_at)) : null;
-  return {
-    id: row.id,
-    title: row.title,
-    excerpt: row.excerpt,
-    summary: row.summary,
-    url: row.original_url,
-    image_url: row.image_url || row.thumbnail_url || null,
-    timeAgo,
-    readTime: row.reading_time ? `${row.reading_time} min` : null,
-    source: row.source_display || 'Source',
-    blindspot_left: !!row.blindspot_left,
-    left_hits: row.left_hits ?? 0,
-    center_hits: row.center_hits ?? 0,
-    right_hits: row.right_hits ?? 0,
-    cluster_key: row.cluster_key,
-    category_id: row.category_id,
-  };
-}
-
-function smartTimeAgo(date) {
-  const now = new Date();
-  const mins = Math.floor((now - date) / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
-}
-
+/* ------------------------------------------------------------------ */
+/* Back-compat aliases (if older code imports these)                   */
+/* ------------------------------------------------------------------ */
+export const fetchArticleById = fetchStoryById
+export const fetchRelatedArticles = fetchRelatedStories
