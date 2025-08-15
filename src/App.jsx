@@ -1,13 +1,13 @@
-// src/App.jsx - WITH TEMPORARY MOCK DATA
+// src/App.jsx - FIXED Three-Column Layout with Viral Priority
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import NewsCard from './components/NewsCard';
+import DailyReads from './components/DailyReads';
+import TrendingStories from './components/TrendingStories';
+import Blindspot from './components/Blindspot';
 import SkeletonCard from './components/SkeletonCard';
-import InlineAd from './components/InlineAd';
 import SubscriptionModal from './components/SubscriptionModal';
-// ─── TEMPORARILY COMMENTED OUT ───────────────────────────────────────
-// import { fetchNews } from './lib/news-api.js';
 import './index.css';
 
 function App() {
@@ -16,7 +16,10 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('TRUMP');
   const [error, setError] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [mostRead, setMostRead] = useState([]);
+  
+  // Separate data for each section
+  const [viralStories, setViralStories] = useState([]);
+  const [dailyReads, setDailyReads] = useState([]);
   const [blindspots, setBlindspots] = useState([]);
 
   const categories = ['TRUMP', 'REPUBLICAN PARTY', 'EUROPE', 'ELON MUSK', 'STEVE BANNON'];
@@ -25,172 +28,207 @@ function App() {
     loadNews(activeCategory);
   }, [activeCategory]);
 
-  // ─── TEMPORARY MOCK DATA FUNCTION ───────────────────────────────────────
   const loadNews = async (category) => {
     try {
       setLoading(true);
       setError(null);
       
-      // TEMPORARY: Mock data to see your UI
+      // Enhanced mock data with viral flags
       const mockNewsData = [
+        // VIRAL STORIES (priority) - first 3
         {
           id: 1,
-          slug: 'trump-policy-update-1',
-          title: `${category}: Major Policy Announcement Expected This Week`,
-          excerpt: `Latest developments in ${category} coverage show significant movement on key issues. Sources close to the matter indicate major announcements expected in the coming days.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=1',
-          thumbnail: 'https://picsum.photos/400/300?random=1',
-          author: 'John Reporter',
-          source: 'Atlantic Anvil News',
+          slug: 'viral-trump-announcement',
+          title: `🔥 VIRAL: ${category} Major Policy Announcement Breaks Internet`,
+          excerpt: `This ${category} announcement has gone completely viral across all social media platforms. Breaking records for engagement and shares.`,
+          content: 'Full viral content...',
+          image: 'https://picsum.photos/800/600?random=viral1',
+          thumbnail: 'https://picsum.photos/400/300?random=viral1',
+          author: 'Breaking News Team',
+          source: 'Atlantic Anvil VIRAL',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['politics', 'breaking-news'],
-          published_at: new Date().toISOString()
+          tags: ['viral', 'breaking'],
+          published_at: new Date().toISOString(),
+          is_viral: true,
+          viral_score: 95,
+          shares: 45000,
+          engagement: 120000
         },
         {
           id: 2,
-          slug: 'analysis-piece-2',
-          title: `${category} Analysis: What This Means for 2024`,
-          excerpt: `In-depth analysis of recent ${category} developments and their potential impact on the upcoming election cycle. Expert opinions and insider insights included.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=2',
-          thumbnail: 'https://picsum.photos/400/300?random=2',
-          author: 'Sarah Analyst',
-          source: 'Political Insider',
+          slug: 'viral-explosive-interview',
+          title: `🚀 EXPLOSIVE: ${category} Interview Everyone's Talking About`,
+          excerpt: `This explosive ${category} interview has taken social media by storm. The quotes are already becoming memes.`,
+          content: 'Full viral content...',
+          image: 'https://picsum.photos/800/600?random=viral2',
+          thumbnail: 'https://picsum.photos/400/300?random=viral2',
+          author: 'Viral News Desk',
+          source: 'Atlantic Anvil VIRAL',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['analysis', '2024-election'],
-          published_at: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+          tags: ['viral', 'interview'],
+          published_at: new Date(Date.now() - 1800000).toISOString(),
+          is_viral: true,
+          viral_score: 89,
+          shares: 32000,
+          engagement: 95000
         },
         {
           id: 3,
-          slug: 'breaking-update-3',
-          title: `Breaking: ${category} Statement on Current Events`,
-          excerpt: `Official statement released regarding recent events. This developing story continues to evolve as more information becomes available.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=3',
-          thumbnail: 'https://picsum.photos/400/300?random=3',
-          author: 'Mike Breaking',
-          source: 'News Wire Service',
+          slug: 'viral-social-media-storm',
+          title: `📱 TRENDING: ${category} Tweet Sparks Massive Response`,
+          excerpt: `Social media erupts as this ${category} post generates thousands of responses and heated debate across platforms.`,
+          content: 'Full viral content...',
+          image: 'https://picsum.photos/800/600?random=viral3',
+          thumbnail: 'https://picsum.photos/400/300?random=viral3',
+          author: 'Social Media Desk',
+          source: 'Atlantic Anvil VIRAL',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['breaking', 'statement'],
-          published_at: new Date(Date.now() - 7200000).toISOString() // 2 hours ago
+          tags: ['viral', 'social-media'],
+          published_at: new Date(Date.now() - 3600000).toISOString(),
+          is_viral: true,
+          viral_score: 82,
+          shares: 28000,
+          engagement: 78000
         },
+
+        // REGULAR TRENDING STORIES - next 6
         {
           id: 4,
-          slug: 'opinion-editorial-4',
-          title: `Opinion: The Future of ${category} Politics`,
-          excerpt: `Editorial perspective on the current state of ${category} politics and what we can expect moving forward. A thoughtful analysis of recent trends.`,
-          content: 'Full article content would go here...',
+          slug: 'analysis-piece-2024',
+          title: `${category} Analysis: What This Means for 2024`,
+          excerpt: `In-depth analysis of recent ${category} developments and their potential impact on the upcoming election cycle.`,
+          content: 'Full article content...',
           image: 'https://picsum.photos/800/600?random=4',
           thumbnail: 'https://picsum.photos/400/300?random=4',
-          author: 'Editorial Board',
-          source: 'Atlantic Anvil Editorial',
+          author: 'Sarah Analyst',
+          source: 'Atlantic Anvil Analysis',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['opinion', 'editorial'],
-          published_at: new Date(Date.now() - 10800000).toISOString() // 3 hours ago
+          tags: ['analysis', '2024-election'],
+          published_at: new Date(Date.now() - 7200000).toISOString(),
+          is_viral: false
         },
         {
           id: 5,
-          slug: 'exclusive-interview-5',
-          title: `Exclusive: Key Figure Discusses ${category} Strategy`,
-          excerpt: `Exclusive interview with a key political figure discussing strategy and upcoming initiatives related to ${category}. Rare insights into behind-the-scenes planning.`,
-          content: 'Full article content would go here...',
+          slug: 'breaking-statement',
+          title: `Breaking: ${category} Official Statement Released`,
+          excerpt: `Official statement released regarding recent events. Key points include policy changes and strategic directions.`,
+          content: 'Full article content...',
           image: 'https://picsum.photos/800/600?random=5',
           thumbnail: 'https://picsum.photos/400/300?random=5',
-          author: 'Interview Team',
-          source: 'Atlantic Anvil Exclusive',
+          author: 'Political Desk',
+          source: 'Atlantic Anvil Breaking',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['exclusive', 'interview'],
-          published_at: new Date(Date.now() - 14400000).toISOString() // 4 hours ago
+          tags: ['breaking', 'statement'],
+          published_at: new Date(Date.now() - 10800000).toISOString(),
+          is_viral: false
         },
         {
           id: 6,
-          slug: 'investigation-report-6',
-          title: `Investigation: Deep Dive into ${category} Connections`,
-          excerpt: `Investigative report examining the connections and relationships within ${category} circles. Months of research reveal surprising findings.`,
-          content: 'Full article content would go here...',
+          slug: 'policy-impact',
+          title: `Policy Impact: How ${category} Changes Affect You`,
+          excerpt: `Direct analysis of how recent ${category} policy changes will impact everyday Americans and businesses.`,
+          content: 'Full article content...',
           image: 'https://picsum.photos/800/600?random=6',
           thumbnail: 'https://picsum.photos/400/300?random=6',
-          author: 'Investigation Team',
-          source: 'Atlantic Anvil Investigations',
+          author: 'Policy Team',
+          source: 'Atlantic Anvil Policy',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['investigation', 'deep-dive'],
-          published_at: new Date(Date.now() - 18000000).toISOString() // 5 hours ago
+          tags: ['policy', 'impact'],
+          published_at: new Date(Date.now() - 14400000).toISOString(),
+          is_viral: false
         },
+
+        // DAILY READS - next 5 for sidebar
         {
           id: 7,
-          slug: 'market-impact-7',
-          title: `Market Watch: How ${category} News Affects Wall Street`,
-          excerpt: `Financial analysis of how ${category} developments impact market trends and investor confidence. Expert commentary on economic implications.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=7',
-          thumbnail: 'https://picsum.photos/400/300?random=7',
-          author: 'Financial Desk',
-          source: 'Market Analytics',
+          slug: 'daily-conservative-win',
+          title: `Daily Win: ${category} Scores Victory on Key Issue`,
+          excerpt: `Conservative victory as ${category} successfully advances important legislation through key committees.`,
+          content: 'Full daily content...',
+          image: 'https://picsum.photos/400/300?random=7',
+          thumbnail: 'https://picsum.photos/300/200?random=7',
+          author: 'Daily Reads Editor',
+          source: 'Atlantic Anvil Daily',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['markets', 'finance'],
-          published_at: new Date(Date.now() - 21600000).toISOString() // 6 hours ago
+          tags: ['daily', 'victory'],
+          published_at: new Date(Date.now() - 18000000).toISOString(),
+          is_daily: true
         },
         {
           id: 8,
-          slug: 'international-perspective-8',
-          title: `International View: Global Response to ${category}`,
-          excerpt: `How international leaders and media are responding to recent ${category} developments. A global perspective on domestic politics.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=8',
-          thumbnail: 'https://picsum.photos/400/300?random=8',
-          author: 'International Desk',
-          source: 'Global News Network',
+          slug: 'daily-patriot-news',
+          title: `Patriot Update: ${category} Stands Firm on Values`,
+          excerpt: `Unwavering commitment to conservative principles as ${category} takes strong stance on traditional values.`,
+          content: 'Full daily content...',
+          image: 'https://picsum.photos/400/300?random=8',
+          thumbnail: 'https://picsum.photos/300/200?random=8',
+          author: 'Patriot Desk',
+          source: 'Atlantic Anvil Patriots',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['international', 'global-response'],
-          published_at: new Date(Date.now() - 25200000).toISOString() // 7 hours ago
+          tags: ['daily', 'patriot'],
+          published_at: new Date(Date.now() - 21600000).toISOString(),
+          is_daily: true
         },
+
+        // BLINDSPOT STORIES - next 5 for right sidebar
         {
           id: 9,
-          slug: 'social-media-buzz-9',
-          title: `Social Media Buzz: ${category} Trending Topics`,
-          excerpt: `Analysis of social media trends and conversations surrounding ${category}. What people are saying online and why it matters.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=9',
-          thumbnail: 'https://picsum.photos/400/300?random=9',
-          author: 'Social Media Team',
-          source: 'Digital Trends',
+          slug: 'blindspot-media-bias',
+          title: `Media Blindspot: What They Won't Tell You About ${category}`,
+          excerpt: `Mainstream media ignores this crucial ${category} development. Here's what they don't want you to know.`,
+          content: 'Full blindspot content...',
+          image: 'https://picsum.photos/400/300?random=9',
+          thumbnail: 'https://picsum.photos/300/200?random=9',
+          author: 'Blindspot Investigator',
+          source: 'Atlantic Anvil Blindspot',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['social-media', 'trending'],
-          published_at: new Date(Date.now() - 28800000).toISOString() // 8 hours ago
+          tags: ['blindspot', 'media-bias'],
+          published_at: new Date(Date.now() - 25200000).toISOString(),
+          is_blindspot: true
         },
         {
           id: 10,
-          slug: 'historical-context-10',
-          title: `Historical Context: ${category} Through the Years`,
-          excerpt: `A look back at how ${category} has evolved over time, providing important historical context for current events and future predictions.`,
-          content: 'Full article content would go here...',
-          image: 'https://picsum.photos/800/600?random=10',
-          thumbnail: 'https://picsum.photos/400/300?random=10',
-          author: 'History Desk',
-          source: 'Atlantic Anvil Archives',
+          slug: 'blindspot-hidden-truth',
+          title: `Hidden Truth: ${category} Story MSM Buried`,
+          excerpt: `The story mainstream media doesn't want you to see about ${category}. Exclusive investigation reveals all.`,
+          content: 'Full blindspot content...',
+          image: 'https://picsum.photos/400/300?random=10',
+          thumbnail: 'https://picsum.photos/300/200?random=10',
+          author: 'Truth Seeker',
+          source: 'Atlantic Anvil Truth',
           category: category,
           category_slug: category.toLowerCase().replace(/\s+/g, '-'),
-          tags: ['history', 'context'],
-          published_at: new Date(Date.now() - 32400000).toISOString() // 9 hours ago
+          tags: ['blindspot', 'hidden'],
+          published_at: new Date(Date.now() - 28800000).toISOString(),
+          is_blindspot: true
         }
       ];
       
       // Simulate loading delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      // Separate stories by type for different sections
+      const viral = mockNewsData.filter(story => story.is_viral);
+      const regular = mockNewsData.filter(story => !story.is_viral && !story.is_daily && !story.is_blindspot);
+      const daily = mockNewsData.filter(story => story.is_daily);
+      const blindspot = mockNewsData.filter(story => story.is_blindspot);
+      
+      // Combine viral + regular for main trending area (viral gets priority)
+      const trendingCombined = [...viral, ...regular];
       
       setNews(mockNewsData);
-      setMostRead(mockNewsData.slice(0, 5));
-      setBlindspots(mockNewsData.slice(5, 10));
+      setViralStories(trendingCombined);
+      setDailyReads(daily);
+      setBlindspots(blindspot);
       
     } catch (err) {
       setError('Failed to load news. Please try again later.');
@@ -206,7 +244,7 @@ function App() {
   const handleMerch = () => window.open('#', '_blank');
 
   return (
-    <div className="app-container">
+    <div className="min-h-screen bg-white">
       <Header 
         onSubscribe={handleSubscribe}
         onDonate={handleDonate}
@@ -216,39 +254,44 @@ function App() {
         onCategoryChange={handleCategoryChange}
       />
       
-      <main className="main-content">
-        {loading && (
-          <div className="loading-container">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+      {/* THREE-COLUMN LAYOUT like itsactuallygoodnews */}
+      <div className="atlantic-layout">
+        {/* LEFT SIDEBAR - Daily Reads */}
+        <aside className="atlantic-daily-sidebar">
+          <DailyReads 
+            stories={loading ? [] : dailyReads} 
+            loading={loading}
+          />
+        </aside>
+
+        {/* CENTER MAIN AREA - Viral Stories (Priority) + Trending */}
+        <main className="atlantic-main-content">
+          <div className="atlantic-trending-header">
+            <h2 className="atlantic-section-title">
+              <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Trending Stories
+            </h2>
+            <div className="atlantic-category-indicator">
+              {activeCategory}
+            </div>
           </div>
-        )}
-        
-        {error && (
-          <div className="error-container">
-            <p className="error-message">{error}</p>
-            <button onClick={() => loadNews(activeCategory)}>Try Again</button>
-          </div>
-        )}
-        
-        {!loading && !error && news.length > 0 && (
-          <div className="news-grid">
-            {news.map((article, index) => (
-              <div key={article.id}>
-                <NewsCard article={article} />
-                {(index + 1) % 3 === 0 && <InlineAd />}
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {!loading && !error && news.length === 0 && (
-          <div className="no-news">
-            <p>No news articles found for {activeCategory}</p>
-          </div>
-        )}
-      </main>
+          
+          <TrendingStories 
+            stories={loading ? [] : viralStories}
+            loading={loading}
+          />
+        </main>
+
+        {/* RIGHT SIDEBAR - Blindspot */}
+        <aside className="atlantic-blindspot-sidebar">
+          <Blindspot 
+            stories={loading ? [] : blindspots}
+            loading={loading}
+          />
+        </aside>
+      </div>
       
       <Footer />
       
