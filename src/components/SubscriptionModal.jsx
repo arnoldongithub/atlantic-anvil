@@ -157,13 +157,7 @@ const SubscriptionModal = ({ onClose }) => {
             {subscriptionTiers.map((tier, index) => (
               <div
                 key={tier.name}
-                className={`relative rounded-2xl p-6 transition-all duration-300 hover:scale-105 ${
-                  tier.popular 
-                    ? 'border-2 shadow-lg' 
-                    : tier.current
-                    ? 'border-2'
-                    : 'border-2 hover:shadow-lg'
-                }`}
+                className={`relative rounded-2xl p-6 transition-all duration-300 hover:scale-105`}
                 style={{
                   background: tier.popular 
                     ? 'linear-gradient(135deg, rgba(214,158,46,0.05), rgba(214,158,46,0.1))' 
@@ -174,7 +168,8 @@ const SubscriptionModal = ({ onClose }) => {
                     ? 'var(--aa-gold)' 
                     : tier.current
                     ? 'var(--border-default)'
-                    : 'var(--border-default)'
+                    : 'var(--border-default)',
+                  border: '2px solid'
                 }}
               >
                 {tier.popular && (
