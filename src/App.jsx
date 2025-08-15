@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import NewsCard from './components/NewsCard';
 import DailyReads from './components/DailyReads';
 import TrendingStories from './components/TrendingStories';
 import Blindspot from './components/Blindspot';
@@ -279,7 +278,7 @@ function App() {
           </div>
           
           <TrendingStories 
-            stories={loading ? [] : viralStories}
+            items={loading ? [] : viralStories}
             loading={loading}
           />
         </main>
