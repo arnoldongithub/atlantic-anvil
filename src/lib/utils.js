@@ -1,9 +1,16 @@
-// Enhanced utils.js - Complete Text Cleaning
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+// Enhanced utils.js - Complete Text Cleaning (Fixed Dependencies)
 
+/**
+ * Simple className utility function (replaces clsx + twMerge)
+ * @param {...any} inputs - Class names to combine
+ * @returns {string} - Combined class names
+ */
 export function cn(...inputs) {
-  return twMerge(clsx(inputs));
+  return inputs
+    .flat()
+    .filter(x => typeof x === 'string' && x.trim().length > 0)
+    .join(' ')
+    .trim();
 }
 
 /**
@@ -511,7 +518,7 @@ export const debounce = (func, wait) => {
 };
 
 /**
- * NEW: Strip all HTML and return plain text (for database cleanup)
+ * Strip all HTML and return plain text (for database cleanup)
  * @param {string} text - Text with potential HTML
  * @returns {string} - Plain text only
  */
@@ -526,7 +533,7 @@ export const stripAllHtml = (text) => {
 };
 
 /**
- * NEW: Clean database text directly (for bulk operations)
+ * Clean database text directly (for bulk operations)
  * @param {string} text - Raw database text
  * @returns {string} - Cleaned text
  */
@@ -547,7 +554,7 @@ export const cleanDatabaseText = (text) => {
 };
 
 /**
- * NEW: Check if text contains HTML tags
+ * Check if text contains HTML tags
  * @param {string} text - Text to check
  * @returns {boolean} - True if contains HTML
  */
